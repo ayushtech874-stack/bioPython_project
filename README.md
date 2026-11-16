@@ -79,6 +79,9 @@ This project implements an intuitive, position-by-position comparison designed f
 - 📥 **Export Reports**:
   - Download position-by-position comparison results as **CSV**.
   - Download formatted plain-text lab analysis report (**`.txt`**).
+  - Download complete academic/professional project report in editable Word format (**`.docx`**).
+- 📘 **Comprehensive Project Documentation**:
+  - Pre-generated editable report: [`DNA_Sequence_Similarity_Checker_Project_Report.docx`](file:///d:/ayush%20biopython/DNA_Sequence_Similarity_Checker_Project_Report.docx) (also in `docs/`).
 - 🧪 **Built-in Presets**: Quick-load standard test cases, unequal length pairs, and real biological examples (e.g., Sickle Cell Anemia mutation in human Beta-Globin).
 
 ---
@@ -100,24 +103,30 @@ This project implements an intuitive, position-by-position comparison designed f
 ```text
 bioPython_project/
 │
-├── README.md                      # Complete project documentation & guide
-├── requirements.txt               # Top-level dependencies list
-├── .gitignore                     # Git ignore rules (pycache, temp files, etc.)
-├── run_app.py                     # Convenience root launcher script
+├── README.md                                          # Complete project documentation & guide
+├── requirements.txt                                   # Top-level dependencies list
+├── .gitignore                                         # Git ignore rules (pycache, temp files, etc.)
+├── run_app.py                                         # Convenience root launcher script
+├── generate_docx_report.py                            # Generator script for academic Word report
+├── DNA_Sequence_Similarity_Checker_Project_Report.docx # Complete editable Word project report
 │
-└── dna_similarity_checker/        # Core application package
-    ├── app.py                     # Streamlit frontend & interactive dashboard
-    ├── sequence_utils.py          # Validation, Biopython FASTA parser, and math
-    ├── visualization.py           # Matplotlib charts & HTML color-coded visualizer
-    ├── test_checker.py            # Automated unit test suite (8 tests)
-    ├── requirements.txt           # Package-specific dependencies
-    ├── README.md                  # Package-level documentation
+├── docs/
+│   └── DNA_Sequence_Similarity_Checker_Project_Report.docx # Backup / documentation folder copy
+│
+└── dna_similarity_checker/                            # Core application package
+    ├── app.py                                         # Streamlit frontend & interactive dashboard
+    ├── sequence_utils.py                              # Validation, Biopython FASTA parser, and math
+    ├── visualization.py                               # Matplotlib charts & HTML color-coded visualizer
+    ├── test_checker.py                                # Automated unit test suite (8 tests)
+    ├── requirements.txt                               # Package-specific dependencies
+    ├── README.md                                      # Package-level documentation
+    ├── DNA_Sequence_Similarity_Checker_Project_Report.docx # Application download asset
     │
-    └── sample_data/               # Pre-loaded FASTA test files
-        ├── seq1.fasta             # Standard 12 nt reference sequence
-        ├── seq2.fasta             # Standard 12 nt sequence with 1 mismatch
-        ├── hba_normal.fasta       # Human Beta-Globin normal allele (HbA)
-        └── hbs_sickle.fasta       # Sickle Cell variant allele (HbS)
+    └── sample_data/                                   # Pre-loaded FASTA test files
+        ├── seq1.fasta                                 # Standard 12 nt reference sequence
+        ├── seq2.fasta                                 # Standard 12 nt sequence with 1 mismatch
+        ├── hba_normal.fasta                           # Human Beta-Globin normal allele (HbA)
+        └── hbs_sickle.fasta                           # Sickle Cell variant allele (HbS)
 ```
 
 ---

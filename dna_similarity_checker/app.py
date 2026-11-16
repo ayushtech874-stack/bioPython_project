@@ -517,32 +517,52 @@ elif menu == "📊 Results & Analytics":
 
         st.markdown("---")
         st.subheader("📥 Export & Download Results")
-        col_d1, col_d2 = st.columns(2)
+        col_d1, col_d2, col_d3 = st.columns(3)
 
         # CSV Download
         with col_d1:
             df = pd.DataFrame(res["comparison_rows"])
             csv_data = df.to_csv(index=False).encode("utf-8")
             st.download_button(
-                label="📄 Download Comparison Results (CSV)",
+                label="📄 Download Results (CSV)",
                 data=csv_data,
                 file_name="dna_similarity_positions.csv",
                 mime="text/csv",
                 use_container_width=True
             )
-            st.caption("Includes Position, Sequence 1, Sequence 2, Status, and Symbol columns.")
+            st.caption("Position, Sequence 1, Sequence 2, Status, and Symbol.")
 
         # Text Report Download
         with col_d2:
             text_rep = generate_text_report(res, name1=res["seq1_name"], name2=res["seq2_name"])
             st.download_button(
-                label="📝 Download Full Text Report (.TXT)",
+                label="📝 Download Summary (.TXT)",
                 data=text_rep.encode("utf-8"),
                 file_name="dna_similarity_report.txt",
                 mime="text/plain",
                 use_container_width=True
             )
-            st.caption("Comprehensive analysis report with header, metrics, alignment chunks, and disclaimers.")
+            st.caption("Formatted analysis report with alignment chunks.")
+
+        # DOCX Project Report Download
+        with col_d3:
+            docx_path = os.path.join(os.path.dirname(__file__), "DNA_Sequence_Similarity_Checker_Project_Report.docx")
+            if not os.path.exists(docx_path):
+                docx_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "DNA_Sequence_Similarity_Checker_Project_Report.docx")
+
+            if os.path.exists(docx_path):
+                with open(docx_path, "rb") as f:
+                    docx_bytes = f.read()
+                st.download_button(
+                    label="📘 Project Report (.DOCX)",
+                    data=docx_bytes,
+                    file_name="DNA_Sequence_Similarity_Checker_Project_Report.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    use_container_width=True
+                )
+                st.caption("Full editable project documentation in Word (.docx).")
+            else:
+                st.button("📘 DOCX Report (Not Found)", disabled=True, use_container_width=True)
 
 # -----------------------------------------------------------------------------
 # PAGE 4: ABOUT THE PROJECT
