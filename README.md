@@ -11,6 +11,8 @@ An interactive, beginner-friendly bioinformatics web application built with **Py
 
 The **DNA Sequence Similarity Checker** allows users to compare two DNA sequences, validate nucleotide fidelity (A, T, G, C, N), calculate percentage similarity, inspect color-coded sequence alignments in real-time, generate high-resolution scientific charts, and export analysis reports.
 
+> 📖 **Comprehensive Masterclass & Viva Guide:** Check out [`ProjectExplanation.html`](file:///d:/ayush%20biopython/ProjectExplanation.html) for complete problem statement analysis, algorithmic derivations, code walk-throughs, and **25+ Viva Voce questions & answers**!
+
 ---
 
 ## 📑 Table of Contents
