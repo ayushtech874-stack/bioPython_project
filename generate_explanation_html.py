@@ -537,7 +537,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                     The maximum sequence length is:
                 </p>
                 <div class="formula-box">
-                    $$L_{max} = \max(L_1, L_2)$$
+                    $$L_{max} = \\max(L_1, L_2)$$
                 </div>
                 <p>
                     If $L_1 \neq L_2$, the shorter sequence is padded with gap characters (<code>-</code>) up to length $L_{max}$.
@@ -595,36 +595,382 @@ else:
             </div>
         </section>
 
-        <!-- SECTION 4: Project Architecture -->
+                <!-- SECTION 4: System & Code Architecture Masterclass -->
         <section id="architecture">
-            <h2 class="section-heading">📁 4. Architecture & File Structure</h2>
+            <h2 class="section-heading">📁 4. System & Code Architecture Masterclass</h2>
+            
             <div class="doc-card">
-                <p>The project follows a clean, decoupled modular architecture:</p>
+                <h3 style="color: var(--accent); margin-bottom: 12px;">4.1 High-Level System Architecture & End-to-End Pipeline</h3>
+                <p>
+                    The DNA Sequence Similarity Checker is engineered with a decoupled, asynchronous 5-tier architecture.
+                    It strictly isolates the client presentation layer from biological sequence computation and serialization services.
+                </p>
+
+                <!-- High-Level System Architecture SVG Diagram -->
+                <div style="background: #0F172A; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin: 20px 0; overflow-x: auto;">
+                    <svg viewBox="0 0 960 490" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                        <defs>
+                            <linearGradient id="gradClient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#0F766E"/>
+                                <stop offset="100%" stop-color="#14B8A6"/>
+                            </linearGradient>
+                            <linearGradient id="gradController" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#1E3A8A"/>
+                                <stop offset="100%" stop-color="#3B82F6"/>
+                            </linearGradient>
+                            <linearGradient id="gradBio" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#065F46"/>
+                                <stop offset="100%" stop-color="#10B981"/>
+                            </linearGradient>
+                            <linearGradient id="gradVis" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#581C87"/>
+                                <stop offset="100%" stop-color="#8B5CF6"/>
+                            </linearGradient>
+                            <linearGradient id="gradExport" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#92400E"/>
+                                <stop offset="100%" stop-color="#F59E0B"/>
+                            </linearGradient>
+                            <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 1 L 8 5 L 0 9 z" fill="#38BDF8"/>
+                            </marker>
+                        </defs>
+
+                        <!-- Background Grid Lines -->
+                        <g stroke="#1E293B" stroke-width="1">
+                            <line x1="40" y1="90" x2="920" y2="90"/>
+                            <line x1="40" y1="180" x2="920" y2="180"/>
+                            <line x1="40" y1="270" x2="920" y2="270"/>
+                            <line x1="40" y1="360" x2="920" y2="360"/>
+                        </g>
+
+                        <!-- Tier 1: Client Presentation -->
+                        <rect x="50" y="30" width="860" height="65" rx="10" fill="#1E293B" stroke="#0D9488" stroke-width="1.8"/>
+                        <rect x="65" y="42" width="160" height="40" rx="6" fill="url(#gradClient)"/>
+                        <text x="145" y="66" fill="#FFFFFF" font-size="12" font-weight="bold" text-anchor="middle">1. Client / Browser</text>
+                        <text x="245" y="58" fill="#F8FAFC" font-size="13" font-weight="bold">Streamlit Web Dashboard (Port 8501)</text>
+                        <text x="245" y="76" fill="#94A3B8" font-size="11">Form Isolation (Zero-Lag Typing) | Reactive View Engine | HTML5 Alignment Matrix</text>
+
+                        <!-- Tier 2: Controller & State -->
+                        <rect x="50" y="115" width="860" height="65" rx="10" fill="#1E293B" stroke="#3B82F6" stroke-width="1.8"/>
+                        <rect x="65" y="127" width="160" height="40" rx="6" fill="url(#gradController)"/>
+                        <text x="145" y="151" fill="#FFFFFF" font-size="12" font-weight="bold" text-anchor="middle">2. Controller & State</text>
+                        <text x="245" y="143" fill="#F8FAFC" font-size="13" font-weight="bold">Streamlit SessionState &amp; Cache Tier</text>
+                        <text x="245" y="161" fill="#94A3B8" font-size="11">`st.session_state` Cache | `@st.cache_data` Memoization | Event Listeners &amp; Preset Dispatchers</text>
+
+                        <!-- Tier 3: Ingestion & Validation -->
+                        <rect x="50" y="200" width="860" height="65" rx="10" fill="#1E293B" stroke="#10B981" stroke-width="1.8"/>
+                        <rect x="65" y="212" width="160" height="40" rx="6" fill="url(#gradBio)"/>
+                        <text x="145" y="236" fill="#FFFFFF" font-size="12" font-weight="bold" text-anchor="middle">3. Ingestion &amp; Validation</text>
+                        <text x="245" y="228" fill="#F8FAFC" font-size="13" font-weight="bold">Biopython Parsing &amp; Normalization Service</text>
+                        <text x="245" y="246" fill="#94A3B8" font-size="11">`Bio.SeqIO` FASTA Parser | Regex Whitespace Stripper | Case Normalizer | IUPAC Nucleotide Validator</text>
+
+                        <!-- Tier 4: Core Domain Logic -->
+                        <rect x="50" y="285" width="860" height="65" rx="10" fill="#1E293B" stroke="#8B5CF6" stroke-width="1.8"/>
+                        <rect x="65" y="297" width="160" height="40" rx="6" fill="url(#gradVis)"/>
+                        <text x="145" y="321" fill="#FFFFFF" font-size="12" font-weight="bold" text-anchor="middle">4. Computational Core</text>
+                        <text x="245" y="313" fill="#F8FAFC" font-size="13" font-weight="bold">Positional Alignment &amp; Metric Engine</text>
+                        <text x="245" y="331" fill="#94A3B8" font-size="11">Index Matching Matrix | Gap Trailing Padding | GC-Content Calculator | Similarity Categorizer</text>
+
+                        <!-- Tier 5: Output & Serialization -->
+                        <rect x="50" y="370" width="860" height="65" rx="10" fill="#1E293B" stroke="#F59E0B" stroke-width="1.8"/>
+                        <rect x="65" y="382" width="160" height="40" rx="6" fill="url(#gradExport)"/>
+                        <text x="145" y="406" fill="#FFFFFF" font-size="12" font-weight="bold" text-anchor="middle">5. Export &amp; Graphics</text>
+                        <text x="245" y="398" fill="#F8FAFC" font-size="13" font-weight="bold">Matplotlib Agg Vectorizer &amp; Multi-Format Exporters</text>
+                        <text x="245" y="416" fill="#94A3B8" font-size="11">Bar/Donut/Track Renderers | CSV Positional Streamer | Text Summary Builder | DOCX Word Compiler</text>
+
+                        <!-- Connector Arrows -->
+                        <path d="M 480 95 L 480 115" stroke="#38BDF8" stroke-width="2.5" marker-end="url(#arrow)"/>
+                        <path d="M 480 180 L 480 200" stroke="#38BDF8" stroke-width="2.5" marker-end="url(#arrow)"/>
+                        <path d="M 480 265 L 480 285" stroke="#38BDF8" stroke-width="2.5" marker-end="url(#arrow)"/>
+                        <path d="M 480 350 L 480 370" stroke="#38BDF8" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+                        <!-- Footer Meta -->
+                        <text x="480" y="465" fill="#64748B" font-size="11" text-anchor="middle">End-to-End Reactive Data Flow: Client Request → Normalization → Algorithmic Scoring → Visualization &amp; Export</text>
+                    </svg>
+                </div>
+
+                <p>
+                    <strong>Execution Flow Walkthrough:</strong>
+                </p>
+                <ol style="margin-left: 20px; margin-bottom: 20px; color: var(--text-main);">
+                    <li><strong>Form Isolation &amp; Dispatch:</strong> The user enters DNA sequences into a decoupled <code>st.form</code>. Unlike raw input widgets that fire a rerun on every keystroke, the form batches interactions entirely in the browser DOM, executing a single WebSocket message only when submitted.</li>
+                    <li><strong>Data Ingestion &amp; Routing:</strong> Inputs are routed to <code>parse_fasta()</code> if starting with a FASTA header <code>&gt;</code>, invoking Biopython's <code>Bio.SeqIO.read()</code>. Raw sequences are cleansed of whitespace and uppercase-normalized.</li>
+                    <li><strong>Guard-Clause Validation:</strong> Sequence strings are evaluated against IUPAC nucleotide regexes. If illegal characters are discovered, execution halts cleanly with an error notification.</li>
+                    <li><strong>Algorithmic Execution:</strong> Valid sequences enter <code>calculate_positional_similarity()</code>. The algorithm computes 1-to-1 index identity, trailing gap counts, GC content ratios, and qualitative interpretation thresholds.</li>
+                    <li><strong>Memoized Output Dispatch:</strong> Result payloads are cached with <code>@st.cache_data</code> to enable zero-latency page transitions, dynamic HTML alignment generation, and export generation (CSV, TXT, DOCX).</li>
+                </ol>
+
+                <hr style="border: 0; border-top: 1px solid var(--border); margin: 25px 0;">
+
+                <h3 style="color: var(--accent); margin-bottom: 12px;">4.2 Code Architecture &amp; Modular Decomposition</h3>
+                <p>
+                    The codebase strictly adheres to the <strong>Single Responsibility Principle (SRP)</strong> and <strong>Separation of Concerns (SoC)</strong>.
+                    Domain logic and mathematical calculations are strictly decoupled from Streamlit presentation code, ensuring 100% automated testability.
+                </p>
+
+                <!-- Code Architecture SVG Diagram -->
+                <div style="background: #0F172A; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin: 20px 0; overflow-x: auto;">
+                    <svg viewBox="0 0 960 460" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                        <!-- Modules Boxes -->
+                        <!-- run_app.py -->
+                        <g>
+                            <rect x="50" y="30" width="220" height="70" rx="8" fill="#1E293B" stroke="#0D9488" stroke-width="2"/>
+                            <text x="160" y="58" fill="#2DD4BF" font-size="13" font-weight="bold" text-anchor="middle">🚀 run_app.py</text>
+                            <text x="160" y="78" fill="#94A3B8" font-size="10.5" text-anchor="middle">Root Launcher &amp; Subprocess</text>
+                        </g>
+
+                        <!-- app.py -->
+                        <g>
+                            <rect x="360" y="30" width="250" height="95" rx="8" fill="#1E293B" stroke="#38BDF8" stroke-width="2"/>
+                            <text x="485" y="58" fill="#38BDF8" font-size="14" font-weight="bold" text-anchor="middle">💻 dna_similarity_checker/app.py</text>
+                            <text x="485" y="78" fill="#F8FAFC" font-size="11" text-anchor="middle">Streamlit Reactive UI &amp; Router</text>
+                            <text x="485" y="98" fill="#94A3B8" font-size="10" text-anchor="middle">Form Batching | Session State | Caching</text>
+                        </g>
+
+                        <!-- test_checker.py -->
+                        <g>
+                            <rect x="690" y="30" width="220" height="70" rx="8" fill="#1E293B" stroke="#10B981" stroke-width="2"/>
+                            <text x="800" y="58" fill="#34D399" font-size="13" font-weight="bold" text-anchor="middle">🧪 test_checker.py</text>
+                            <text x="800" y="78" fill="#94A3B8" font-size="10.5" text-anchor="middle">Automated 8-Test Suite</text>
+                        </g>
+
+                        <!-- sequence_utils.py -->
+                        <g>
+                            <rect x="180" y="190" width="280" height="130" rx="8" fill="#1E293B" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="320" y="218" fill="#FBBF24" font-size="13.5" font-weight="bold" text-anchor="middle">⚙️ sequence_utils.py</text>
+                            <text x="320" y="238" fill="#F8FAFC" font-size="11" text-anchor="middle">Pure Biological Computational Core</text>
+                            <line x1="195" y1="248" x2="445" y2="248" stroke="#334155" stroke-width="1"/>
+                            <text x="200" y="266" fill="#94A3B8" font-size="10">• clean_sequence()</text>
+                            <text x="200" y="282" fill="#94A3B8" font-size="10">• validate_dna_sequence()</text>
+                            <text x="200" y="298" fill="#94A3B8" font-size="10">• parse_fasta() (BioPython)</text>
+                            <text x="330" y="266" fill="#94A3B8" font-size="10">• calculate_positional_similarity()</text>
+                            <text x="330" y="282" fill="#94A3B8" font-size="10">• calculate_gc_content()</text>
+                            <text x="330" y="298" fill="#94A3B8" font-size="10">• generate_text_report()</text>
+                        </g>
+
+                        <!-- visualization.py -->
+                        <g>
+                            <rect x="520" y="190" width="280" height="130" rx="8" fill="#1E293B" stroke="#EC4899" stroke-width="2"/>
+                            <text x="660" y="218" fill="#F472B6" font-size="13.5" font-weight="bold" text-anchor="middle">🎨 visualization.py</text>
+                            <text x="660" y="238" fill="#F8FAFC" font-size="11" text-anchor="middle">Rendering &amp; Graphics Engine</text>
+                            <line x1="535" y1="248" x2="785" y2="248" stroke="#334155" stroke-width="1"/>
+                            <text x="540" y="266" fill="#94A3B8" font-size="10">• plot_comparison_barchart()</text>
+                            <text x="540" y="282" fill="#94A3B8" font-size="10">• plot_similarity_donut()</text>
+                            <text x="540" y="298" fill="#94A3B8" font-size="10">• plot_position_track()</text>
+                            <text x="670" y="266" fill="#94A3B8" font-size="10">• render_html_sequence_alignment()</text>
+                            <text x="670" y="282" fill="#94A3B8" font-size="10">• Matplotlib Agg Non-Interactive</text>
+                            <text x="670" y="298" fill="#94A3B8" font-size="10">• Theme-Adaptive Contrast CSS</text>
+                        </g>
+
+                        <!-- Supporting Generators -->
+                        <g>
+                            <rect x="250" y="370" width="220" height="60" rx="6" fill="#1E293B" stroke="#64748B" stroke-width="1.5"/>
+                            <text x="360" y="394" fill="#CBD5E1" font-size="11.5" font-weight="bold" text-anchor="middle">📄 generate_docx_report.py</text>
+                            <text x="360" y="412" fill="#94A3B8" font-size="9.5" text-anchor="middle">Academic Word (.docx) Builder</text>
+                        </g>
+                        <g>
+                            <rect x="510" y="370" width="230" height="60" rx="6" fill="#1E293B" stroke="#64748B" stroke-width="1.5"/>
+                            <text x="625" y="394" fill="#CBD5E1" font-size="11.5" font-weight="bold" text-anchor="middle">🌐 generate_explanation_html.py</text>
+                            <text x="625" y="412" fill="#94A3B8" font-size="9.5" text-anchor="middle">Interactive HTML Docs Generator</text>
+                        </g>
+
+                        <!-- Dependency Flow Lines -->
+                        <path d="M 270 65 L 360 65" stroke="#38BDF8" stroke-width="2" marker-end="url(#arrow)"/>
+                        <path d="M 430 125 L 340 190" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrow)"/>
+                        <path d="M 540 125 L 630 190" stroke="#EC4899" stroke-width="2" marker-end="url(#arrow)"/>
+                        <path d="M 750 100 L 440 190" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
+                        <path d="M 780 100 L 680 190" stroke="#EC4899" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
+                    </svg>
+                </div>
+
+                <h4 style="margin: 18px 0 10px 0; color: var(--primary);">Modular Responsibility Matrix</h4>
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>File / Module</th>
+                            <th>Layer</th>
+                            <th>Key Responsibilities</th>
+                            <th>Design Pattern Employed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>run_app.py</code></td>
+                            <td>Entry Point</td>
+                            <td>Resolves virtual environment path, sets headless configuration, launches Streamlit subprocess.</td>
+                            <td><strong>Facade Pattern</strong> (simplified launch CLI)</td>
+                        </tr>
+                        <tr>
+                            <td><code>dna_similarity_checker/app.py</code></td>
+                            <td>Presentation &amp; Controller</td>
+                            <td>Manages Streamlit session state, renders forms, binds sample presets, dispatches cached calculations.</td>
+                            <td><strong>MVC Controller / Reactive View</strong></td>
+                        </tr>
+                        <tr>
+                            <td><code>dna_similarity_checker/sequence_utils.py</code></td>
+                            <td>Domain Logic</td>
+                            <td>Pure computational functions for FASTA ingestion, string cleaning, DNA validation, and positional identity math.</td>
+                            <td><strong>Pipeline Pattern &amp; Pure Functions</strong></td>
+                        </tr>
+                        <tr>
+                            <td><code>dna_similarity_checker/visualization.py</code></td>
+                            <td>Graphics Engine</td>
+                            <td>Constructs publication-grade Matplotlib figures and HTML color-coded alignment chunk matrices.</td>
+                            <td><strong>Renderer Pattern / Strategy Pattern</strong></td>
+                        </tr>
+                        <tr>
+                            <td><code>dna_similarity_checker/test_checker.py</code></td>
+                            <td>Quality Assurance</td>
+                            <td>Executes 8 automated unit tests verifying benchmark cases, unequal lengths, error bounds, and FASTA records.</td>
+                            <td><strong>Automated Unit Test Suite</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 style="margin: 22px 0 10px 0; color: var(--primary);">Data Contract: Positional Similarity Output Schema</h4>
+                <p>
+                    When <code>calculate_positional_similarity(s1, s2)</code> completes, it yields a standardized, strongly-typed dictionary:
+                </p>
+                <pre><code>{
+    "len1": 18,                                 # int: Length of Sequence 1
+    "len2": 18,                                 # int: Length of Sequence 2
+    "max_len": 18,                              # int: Maximum alignment length (denominator)
+    "matches": 17,                              # int: Number of identical nucleotides at same index
+    "mismatches": 1,                            # int: Number of differing nucleotides
+    "gaps": 0,                                  # int: Trailing unaligned gap positions
+    "similarity_percentage": 94.44,             # float: (matches / max_len) * 100
+    "match_percentage": 94.44,                  # float: Percentage of matches
+    "mismatch_percentage": 5.56,                # float: Percentage of mismatches
+    "gap_percentage": 0.0,                      # float: Percentage of gaps
+    "gc_content1": 50.0,                        # float: (G+C)/len1 * 100 for Seq 1
+    "gc_content2": 50.0,                        # float: (G+C)/len2 * 100 for Seq 2
+    "interpretation_label": "Very High Positional Similarity",
+    "interpretation_color": "#10B981",          # Hex code for UI status badge
+    "interpretation_desc": "Sequences share 90% or more identical nucleotides...",
+    "aligned_seq1": "ACTCCTGAGGAGAAGTCT",       # str: Padded Sequence 1
+    "aligned_seq2": "ACTCCTGTGGAGAAGTCT",       # str: Padded Sequence 2
+    "match_string": "|||||||.||||||||||",       # str: Alignment representation (| = match, . = mismatch, - = gap)
+    "comparison_rows": [                        # List[Dict]: Position-by-position row breakdown
+        {"Position": 1, "Sequence 1": "A", "Sequence 2": "A", "Status": "Match", "Symbol": "|"},
+        {"Position": 8, "Sequence 1": "A", "Sequence 2": "T", "Status": "Mismatch", "Symbol": "."}
+    ]
+}</code></pre>
+
+                <hr style="border: 0; border-top: 1px solid var(--border); margin: 25px 0;">
+
+                <h3 style="color: var(--accent); margin-bottom: 12px;">4.3 Architectural Evaluation: "Why Streamlit?" &amp; Performance Engineering</h3>
+                <p>
+                    Bioinformatics software architects frequently evaluate whether to build applications in <strong>Streamlit</strong>, 
+                    <strong>Flask/FastAPI + React</strong>, or <strong>pure Client-Side JavaScript/WebAssembly</strong>.
+                    Here is the definitive architectural comparison:
+                </p>
+
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Evaluation Criterion</th>
+                            <th>Streamlit (This Project)</th>
+                            <th>FastAPI / Flask + React</th>
+                            <th>Client-Side JS / WebAssembly</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Language Ecosystem</strong></td>
+                            <td><span style="color:#10B981; font-weight:bold;">100% Pure Python</span></td>
+                            <td>Python (Backend) + TypeScript/React (Frontend)</td>
+                            <td>JavaScript / TypeScript / Rust (WASM)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Biopython Compatibility</strong></td>
+                            <td><span style="color:#10B981; font-weight:bold;">Direct in-process</span> (<code>Bio.SeqIO</code>, <code>Bio.Seq</code>)</td>
+                            <td>Requires JSON REST API serialization bridge</td>
+                            <td>Difficult; requires Pyodide or JS reimplementation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>State &amp; Execution Model</strong></td>
+                            <td>Server-driven reactive loop over WebSockets</td>
+                            <td>Client-side virtual DOM with async REST fetches</td>
+                            <td>Pure client-side event-driven rendering</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Development Overhead</strong></td>
+                            <td><span style="color:#10B981; font-weight:bold;">Minimal (Single codebase, zero build step)</span></td>
+                            <td>High (2 codebases, CORS, npm/vite packaging)</td>
+                            <td>Moderate to High</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Why It Can Feel Laggy</strong></td>
+                            <td>Reruns entire script on unbatched input events</td>
+                            <td>Network latency on unoptimized API endpoints</td>
+                            <td>Client device CPU bottlenecks on large datasets</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Best Architectural Fit</strong></td>
+                            <td><strong>Bioinformatics research, clinical prototypes, data science dashboards</strong></td>
+                            <td>Commercial multi-tenant SaaS platforms</td>
+                            <td>Offline standalone browser tools</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 style="margin: 18px 0 10px 0; color: var(--primary);">Root Causes of Localhost Latency &amp; How We Solved Them:</h4>
+                <div class="callout callout-info">
+                    <p><strong>1. Input Typing Lag Eliminated via Form Batching:</strong></p>
+                    <p>
+                        In standard Streamlit implementations, placing <code>st.text_area</code> in the open script body causes a full server re-execution on every key stroke or debounced pause.
+                        By wrapping input widgets inside <code>with st.form("dna_comparison_form"):</code>, input state changes are retained entirely within the client's browser memory until the user clicks <em>"Run Sequence Comparison"</em>. Typing operates at 60 FPS without WebSocket round-trips.
+                    </p>
+                </div>
+                <div class="callout callout-info">
+                    <p><strong>2. Matplotlib Font Scanner Bottleneck Removed:</strong></p>
+                    <p>
+                        On Windows systems, Matplotlib's default font manager scans the entire <code>C:\Windows\Fonts</code> directory when requested to resolve non-standard weights (such as <code>semibold</code> or <code>medium</code>). This caused a 3-5 second delay during plot rasterization.
+                        We resolved this by setting global font preferences to pre-cached <code>DejaVu Sans</code> and standard weights (<code>bold</code>, <code>normal</code>), and caching figure generators with <code>@st.cache_data</code>.
+                    </p>
+                </div>
+                <div class="callout callout-info">
+                    <p><strong>3. Contrast &amp; Invisibility Fixed with Adaptive Dark-Theming:</strong></p>
+                    <p>
+                        Hardcoded deep navy colors (<code>#0F172A</code>) previously resulted in near-zero contrast when rendered against Streamlit's dark mode background (<code>#0E1117</code>).
+                        We re-engineered the styling system with explicit high-contrast text (<code>#F8FAFC</code>), slate card backdrops (<code>#1E293B</code>), and vibrant color-coded status badges.
+                    </p>
+                </div>
+
+                <h4 style="margin: 18px 0 10px 0; color: var(--primary);">4.4 Complete Project Directory Tree</h4>
                 <pre><code>bioPython_project/
+│
+├── .streamlit/
+│   └── config.toml                                    # High-performance server &amp; theme settings
 │
 ├── README.md                                          # GitHub project landing documentation
 ├── requirements.txt                                   # Python dependencies
 ├── run_app.py                                         # Root launcher convenience script
 ├── generate_docx_report.py                            # Academic Word report builder
 ├── DNA_Sequence_Similarity_Checker_Project_Report.docx # Editable Word report file
-├── ProjectExplanation.html                            # Complete masterclass documentation & Viva guide
+├── ProjectExplanation.html                            # Complete masterclass documentation &amp; Viva guide
+├── generate_explanation_html.py                       # Master documentation generator script
 │
 ├── docs/
-│   └── DNA_Sequence_Similarity_Checker_Project_Report.docx
+│   ├── DNA_Sequence_Similarity_Checker_Project_Report.docx
+│   └── ProjectExplanation.html
 │
 └── dna_similarity_checker/                            # Primary application package
-    ├── app.py                                         # Streamlit user interface & dashboard
-    ├── sequence_utils.py                              # Biopython FASTA parser & computational logic
-    ├── visualization.py                               # Matplotlib charts & HTML alignment view
+    ├── .streamlit/
+    │   └── config.toml                                # Package-level Streamlit settings
+    ├── app.py                                         # Streamlit user interface &amp; dashboard
+    ├── sequence_utils.py                              # Biopython FASTA parser &amp; computational logic
+    ├── visualization.py                               # Matplotlib charts &amp; HTML alignment view
     ├── test_checker.py                                # Automated unit test suite (8 tests)
     ├── requirements.txt                               # Package dependencies
     ├── README.md                                      # Sub-package readme
+    ├── ProjectExplanation.html                        # Local copy of masterclass docs
     │
     └── sample_data/                                   # Pre-loaded FASTA test cases
         ├── seq1.fasta                                 # 12 nt reference sequence
         ├── seq2.fasta                                 # 12 nt variant sequence
-        ├── hba_normal.fasta                           # Human Normal Beta-Globin
-        └── hbs_sickle.fasta                           # Human Sickle Beta-Globin</code></pre>
+        ├── hba_normal.fasta                           # Human Normal Beta-Globin (Codons 4-9)
+        └── hbs_sickle.fasta                           # Human Sickle Beta-Globin (Codon 6 Mutation)</code></pre>
             </div>
         </section>
 

@@ -4,7 +4,8 @@ visualization.py
 Matplotlib chart generation and HTML color-coded sequence alignment
 visualizations for the DNA Sequence Similarity Checker.
 
-Styled for a clean, modern, publication-ready scientific aesthetic.
+Styled for a clean, modern, high-contrast publication-ready scientific aesthetic.
+Compatible with dark and light themes, optimized to eliminate font scanning latency.
 """
 
 import os
@@ -19,15 +20,19 @@ matplotlib.use("Agg")  # Non-interactive backend safe for Streamlit
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Configure matplotlib font preferences globally to eliminate font scanner delays
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial', 'Helvetica', 'sans-serif']
 
-# Brand scientific palette
+# High-contrast scientific palette
 COLOR_MATCH = "#10B981"       # Emerald Green
 COLOR_MISMATCH = "#EF4444"    # Crimson Red
-COLOR_GAP = "#9CA3AF"         # Slate Grey
-COLOR_NAVY = "#0F172A"        # Deep Navy
-COLOR_BG = "#FFFFFF"          # Clean White
-COLOR_GRID = "#E2E8F0"        # Subtle Slate Grid
+COLOR_GAP = "#94A3B8"         # Slate Grey
 COLOR_TEAL = "#0D9488"        # Vibrant Teal
+COLOR_BG = "#1E293B"          # Dark Slate Card
+COLOR_TEXT = "#F8FAFC"        # Bright White/Slate
+COLOR_MUTED = "#94A3B8"       # Secondary text
+COLOR_GRID = "#334155"        # Slate Grid
 
 
 def plot_comparison_barchart(stats: Dict[str, Any]) -> plt.Figure:
@@ -44,20 +49,20 @@ def plot_comparison_barchart(stats: Dict[str, Any]) -> plt.Figure:
     ]
     colors = [COLOR_MATCH, COLOR_MISMATCH, COLOR_GAP]
 
-    fig, ax = plt.subplots(figsize=(7, 4.2), dpi=150)
+    fig, ax = plt.subplots(figsize=(6.5, 3.8), dpi=130)
     fig.patch.set_facecolor(COLOR_BG)
-    ax.set_facecolor("#F8FAFC")
+    ax.set_facecolor(COLOR_BG)
 
-    bars = ax.bar(categories, counts, color=colors, width=0.55, edgecolor="none", zorder=3)
+    bars = ax.bar(categories, counts, color=colors, width=0.52, edgecolor="none", zorder=3)
 
     # Style axes and spines
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
-    ax.spines["left"].set_color("#CBD5E1")
-    ax.spines["bottom"].set_color("#94A3B8")
+    ax.spines["left"].set_color(COLOR_GRID)
+    ax.spines["bottom"].set_color(COLOR_GRID)
     ax.spines["bottom"].set_linewidth(1.2)
 
-    ax.yaxis.grid(True, linestyle="--", alpha=0.7, color=COLOR_GRID, zorder=0)
+    ax.yaxis.grid(True, linestyle="--", alpha=0.5, color=COLOR_GRID, zorder=0)
     ax.set_axisbelow(True)
 
     # Annotate bars with counts and percentages
@@ -74,16 +79,16 @@ def plot_comparison_barchart(stats: Dict[str, Any]) -> plt.Figure:
             textcoords="offset points",
             ha="center",
             va="bottom",
-            fontsize=10,
+            fontsize=9.5,
             fontweight="bold",
-            color=COLOR_NAVY
+            color=COLOR_TEXT
         )
 
-    ax.set_ylabel("Number of Positions", fontsize=11, fontweight="semibold", color=COLOR_NAVY, labelpad=8)
+    ax.set_ylabel("Number of Positions", fontsize=10, fontweight="bold", color=COLOR_TEXT, labelpad=8)
     ax.set_title("Positional Breakdown (Matches vs. Mismatches vs. Gaps)",
-                 fontsize=12, fontweight="bold", color=COLOR_NAVY, pad=14)
-    ax.tick_params(axis="x", colors=COLOR_NAVY, labelsize=10.5)
-    ax.tick_params(axis="y", colors="#475569", labelsize=9.5)
+                 fontsize=11.5, fontweight="bold", color=COLOR_TEXT, pad=12)
+    ax.tick_params(axis="x", colors=COLOR_TEXT, labelsize=10)
+    ax.tick_params(axis="y", colors=COLOR_MUTED, labelsize=9)
 
     plt.tight_layout()
     return fig
@@ -99,7 +104,7 @@ def plot_similarity_donut(stats: Dict[str, Any]) -> plt.Figure:
 
     labels = [f"Similarity ({sim_pct}%)", f"Difference ({diff_pct}%)"]
     sizes = [sim_pct, diff_pct]
-    colors = [stats.get("interpretation_color", COLOR_TEAL), "#E2E8F0"]
+    colors = [stats.get("interpretation_color", COLOR_TEAL), "#334155"]
 
     # If 100% or 0%, adjust to prevent matplotlib warning
     if sim_pct == 100.0:
@@ -111,8 +116,9 @@ def plot_similarity_donut(stats: Dict[str, Any]) -> plt.Figure:
         labels = [f"Difference (100%)"]
         colors = [COLOR_MISMATCH]
 
-    fig, ax = plt.subplots(figsize=(5.5, 4.2), dpi=150)
+    fig, ax = plt.subplots(figsize=(5.2, 3.8), dpi=130)
     fig.patch.set_facecolor(COLOR_BG)
+    ax.set_facecolor(COLOR_BG)
 
     wedges, _ = ax.pie(
         sizes,
@@ -124,21 +130,22 @@ def plot_similarity_donut(stats: Dict[str, Any]) -> plt.Figure:
 
     # Central metric text
     ax.text(0, 0.08, f"{sim_pct:.1f}%", ha="center", va="center",
-            fontsize=22, fontweight="bold", color=COLOR_NAVY)
+            fontsize=20, fontweight="bold", color=COLOR_TEXT)
     ax.text(0, -0.15, "Positional\nSimilarity", ha="center", va="center",
-            fontsize=9.5, fontweight="medium", color="#64748B")
+            fontsize=9.5, fontweight="normal", color=COLOR_MUTED)
 
     ax.legend(
         wedges, labels,
         loc="lower center",
-        bbox_to_anchor=(0.5, -0.1),
+        bbox_to_anchor=(0.5, -0.12),
         ncol=2,
         frameon=False,
-        fontsize=9.5
+        fontsize=9,
+        labelcolor=COLOR_TEXT
     )
 
     ax.set_title("Overall Positional Identity",
-                 fontsize=12, fontweight="bold", color=COLOR_NAVY, pad=12)
+                 fontsize=11.5, fontweight="bold", color=COLOR_TEXT, pad=10)
 
     plt.tight_layout()
     return fig
@@ -151,7 +158,9 @@ def plot_position_track(comparison_rows: List[Dict[str, Any]]) -> plt.Figure:
     """
     total = len(comparison_rows)
     if total == 0:
-        fig, ax = plt.subplots(figsize=(8, 1.8), dpi=150)
+        fig, ax = plt.subplots(figsize=(8, 1.8), dpi=130)
+        fig.patch.set_facecolor(COLOR_BG)
+        ax.set_facecolor(COLOR_BG)
         return fig
 
     # Map statuses to colors
@@ -162,9 +171,9 @@ def plot_position_track(comparison_rows: List[Dict[str, Any]]) -> plt.Figure:
     }
     bar_colors = [status_colors.get(row["Status"], COLOR_GAP) for row in comparison_rows]
 
-    fig, ax = plt.subplots(figsize=(9, 1.8), dpi=150)
+    fig, ax = plt.subplots(figsize=(8.5, 1.7), dpi=130)
     fig.patch.set_facecolor(COLOR_BG)
-    ax.set_facecolor("#F8FAFC")
+    ax.set_facecolor(COLOR_BG)
 
     # Plot vertical bars for each position
     x_positions = np.arange(1, total + 1)
@@ -176,11 +185,11 @@ def plot_position_track(comparison_rows: List[Dict[str, Any]]) -> plt.Figure:
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.spines["left"].set_visible(False)
-    ax.spines["bottom"].set_color("#94A3B8")
+    ax.spines["bottom"].set_color(COLOR_GRID)
 
-    ax.set_xlabel("Nucleotide Position (5' → 3')", fontsize=10, fontweight="semibold", color=COLOR_NAVY, labelpad=6)
-    ax.set_title("Sequence Distribution Track", fontsize=11, fontweight="bold", color=COLOR_NAVY, pad=8)
-    ax.tick_params(axis="x", colors=COLOR_NAVY, labelsize=9)
+    ax.set_xlabel("Nucleotide Position (5' → 3')", fontsize=9.5, fontweight="bold", color=COLOR_TEXT, labelpad=6)
+    ax.set_title("Sequence Distribution Track", fontsize=11, fontweight="bold", color=COLOR_TEXT, pad=8)
+    ax.tick_params(axis="x", colors=COLOR_MUTED, labelsize=8.5)
 
     plt.tight_layout()
     return fig
@@ -197,35 +206,37 @@ def render_html_sequence_alignment(seq1: str, seq2: str, comparison_rows: List[D
       - Grey: Gaps / missing positions
     """
     if not comparison_rows:
-        return "<p style='color: #64748B;'>No sequence data to display.</p>"
+        return "<p style='color: #94A3B8;'>No sequence data to display.</p>"
 
     html_parts = [
         """
         <style>
         .dna-align-container {
-            font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
-            background-color: #F8FAFC;
-            border: 1px solid #E2E8F0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'JetBrains Mono', Consolas, monospace;
+            background-color: #0F172A;
+            border: 1px solid #334155;
             border-radius: 12px;
-            padding: 20px;
-            margin: 15px 0;
+            padding: 18px 20px;
+            margin: 10px 0;
             overflow-x: auto;
+            color: #F8FAFC;
         }
         .dna-chunk {
-            margin-bottom: 22px;
+            margin-bottom: 20px;
             padding-bottom: 12px;
-            border-bottom: 1px dashed #CBD5E1;
+            border-bottom: 1px dashed #334155;
         }
         .dna-chunk:last-child {
             border-bottom: none;
             margin-bottom: 0;
+            padding-bottom: 0;
         }
         .dna-chunk-header {
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 700;
-            color: #0F172A;
+            color: #38BDF8;
             margin-bottom: 8px;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             text-transform: uppercase;
         }
         .dna-grid {
@@ -239,70 +250,71 @@ def render_html_sequence_alignment(seq1: str, seq2: str, comparison_rows: List[D
             gap: 4px;
         }
         .dna-label {
-            width: 75px;
+            width: 82px;
             font-size: 11px;
             font-weight: 700;
-            color: #475569;
+            color: #94A3B8;
             text-align: right;
             padding-right: 10px;
             user-select: none;
             flex-shrink: 0;
         }
         .dna-cell {
-            width: 26px;
-            height: 28px;
+            width: 28px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 13.5px;
             font-weight: 700;
-            border-radius: 5px;
-            font-family: 'Consolas', 'Courier New', monospace;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
             flex-shrink: 0;
+            transition: transform 0.1s ease;
         }
         .cell-match {
-            background-color: #DCFCE7;
-            color: #15803D;
-            border: 1px solid #86EFAC;
+            background-color: rgba(16, 185, 129, 0.22);
+            color: #34D399;
+            border: 1px solid rgba(52, 211, 153, 0.45);
         }
         .cell-mismatch {
-            background-color: #FEE2E2;
-            color: #B91C1C;
-            border: 1px solid #FCA5A5;
+            background-color: rgba(239, 68, 68, 0.22);
+            color: #F87171;
+            border: 1px solid rgba(248, 113, 113, 0.45);
         }
         .cell-gap {
-            background-color: #F1F5F9;
-            color: #64748B;
-            border: 1px solid #CBD5E1;
+            background-color: rgba(148, 163, 184, 0.12);
+            color: #94A3B8;
+            border: 1px solid rgba(148, 163, 184, 0.25);
         }
         .dna-sym {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 800;
-            color: #0D9488;
         }
         .sym-match {
-            color: #10B981;
+            color: #34D399;
         }
         .sym-mismatch {
-            color: #EF4444;
+            color: #F87171;
         }
         .sym-gap {
-            color: #94A3B8;
+            color: #64748B;
         }
         .pos-num {
             font-size: 9.5px;
-            color: #94A3B8;
+            color: #64748B;
             font-weight: 600;
+            background: transparent;
         }
         .dna-legend {
             display: flex;
-            gap: 18px;
+            gap: 20px;
             margin-top: 14px;
             font-size: 12px;
             font-weight: 600;
             padding-top: 10px;
-            border-top: 1px solid #E2E8F0;
+            border-top: 1px solid #334155;
+            color: #CBD5E1;
         }
         .legend-item {
             display: flex;
@@ -312,7 +324,7 @@ def render_html_sequence_alignment(seq1: str, seq2: str, comparison_rows: List[D
         .legend-badge {
             width: 14px;
             height: 14px;
-            border-radius: 3px;
+            border-radius: 4px;
             display: inline-block;
         }
         </style>
@@ -364,16 +376,16 @@ def render_html_sequence_alignment(seq1: str, seq2: str, comparison_rows: List[D
     html_parts.append("""
         <div class="dna-legend">
             <div class="legend-item">
-                <span class="legend-badge" style="background:#DCFCE7; border:1px solid #86EFAC;"></span>
-                <span style="color:#15803D;">Match (|)</span>
+                <span class="legend-badge" style="background:rgba(16, 185, 129, 0.22); border:1px solid #34D399;"></span>
+                <span style="color:#34D399;">Match (|)</span>
             </div>
             <div class="legend-item">
-                <span class="legend-badge" style="background:#FEE2E2; border:1px solid #FCA5A5;"></span>
-                <span style="color:#B91C1C;">Mismatch (•)</span>
+                <span class="legend-badge" style="background:rgba(239, 68, 68, 0.22); border:1px solid #F87171;"></span>
+                <span style="color:#F87171;">Mismatch (•)</span>
             </div>
             <div class="legend-item">
-                <span class="legend-badge" style="background:#F1F5F9; border:1px solid #CBD5E1;"></span>
-                <span style="color:#64748B;">Gap (—)</span>
+                <span class="legend-badge" style="background:rgba(148, 163, 184, 0.15); border:1px solid #94A3B8;"></span>
+                <span style="color:#94A3B8;">Gap (—)</span>
             </div>
         </div>
     </div>

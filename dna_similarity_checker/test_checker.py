@@ -141,5 +141,5 @@ if __name__ == "__main__":
     test_visualizations()
     test_text_report()
     print("=" * 60)
-    print("ALL 8 TESTS PASSED SUCCESSFULLY! ✅")
+    print("ALL 8 TESTS PASSED SUCCESSFULLY! [OK]")
     print("=" * 60)
